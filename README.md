@@ -1,6 +1,7 @@
-=======================
-=== project_ansible ===
-=======================
+=====================
+== project_ansible ==
+=====================
+
 vars:
 The var directory contains three encrypted variables, logs ,info and group_l, which contain the location of a specific file on the master computer. To access the values of these variables in your Ansible playbook or task, you would need to decrypt them using Ansible Vault.
 
