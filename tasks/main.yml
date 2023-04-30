@@ -1,0 +1,51 @@
+---
+- name: Remove the old files if exsist
+  local_action:
+    module: file
+    path: "{{ item }}"
+    state: absent
+  loop:
+  - "{{ info }}"
+  - "{{ logs }}"
+  - "{{group_l}}"
+
+- name: pinging
+  ping:
+
+- name: check ip address
+  debug:
+    var: "ansible_default_ipv4.address"
+
+- name: write informtion
+  local_action:
+    module: shell
+    cmd: "echo 'computer name: {{ inventory_hostname }}, operating system: {{ansible_os_family}},  ip address: {{ ansible_default_ipv4.address }}\n' >> {{ info }} "
+      
+- name: get the log contents
+  shell: "grep -i ansible {{ syslog }} | grep -i april"
+  register: log_contents
+  notify: get log
+  ignore_errors: yes
+  
+- name: copy the group file from all of the hosts
+  fetch:
+    src: "{{ group }}" 
+    dest: group_l
+    flat: yes
+
+- name: update all the Debian hosts
+  apt:
+    update_cache: yes  
+  when: ansible_os_family == "Debian"
+
+- name: update all the redhat hosts
+  yum:
+    update_cache: yes  
+  when: ansible_os_family == "RedHat"
+
+- name: reboot all hosts
+  command: "reboot"
+  async: 1
+  poll: 40
+  delegate_to: "{{item}}"
+  loop: "{{ groups['g1'] }}"

@@ -1,0 +1,6 @@
+---
+# handlers file for project_ansible
+- name: get log
+  local_action:
+    module: shell 
+    cmd: "echo 'computer name: {{ inventory_hostname }}\n {{ log_contents.stdout }}\n' >> {{ logs }}"
